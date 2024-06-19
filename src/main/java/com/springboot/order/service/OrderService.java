@@ -6,10 +6,15 @@ import com.springboot.exception.ExceptionCode;
 import com.springboot.member.service.MemberService;
 import com.springboot.order.entity.Order;
 import com.springboot.order.repository.OrderRepository;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrderService {
@@ -42,8 +47,9 @@ public class OrderService {
         return findVerifiedOrder(orderId);
     }
 
-    public List<Order> findOrders() {
-        return (List<Order>) orderRepository.findAll();
+    public Page<Order> findOrders(Pageable pageable) {
+
+        return orderRepository.findAll(pageable);
     }
 
     public void cancelOrder(long orderId) {

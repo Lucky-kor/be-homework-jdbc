@@ -1,5 +1,6 @@
 package com.springboot.order.mapper;
 
+import com.springboot.response.PageInfo;
 import com.springboot.coffee.entity.Coffee;
 import com.springboot.order.entity.OrderCoffee;
 import com.springboot.coffee.service.CoffeeService;
@@ -7,8 +8,10 @@ import com.springboot.order.dto.OrderCoffeeResponseDto;
 import com.springboot.order.dto.OrderPostDto;
 import com.springboot.order.dto.OrderResponseDto;
 import com.springboot.order.entity.Order;
+import com.springboot.response.PageResponseDtos;
 import org.mapstruct.Mapper;
 
+import org.springframework.data.domain.Page;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -62,5 +65,15 @@ public interface OrderMapper {
                             coffee.getPrice(),
                             orderCoffee.getQuantity());
                 }).collect(Collectors.toList());
+    }
+    default PageResponseDtos orderToPageResponseDtos(Page<Order>orders){
+        PageInfo pageInfo = new PageInfo(
+                orders.getNumber()+1,
+                orders.getSize(),
+                orders.getNumberOfElements(),
+                orders.getTotalPages());
+
+        return new PageResponseDtos(orders.getContent(),pageInfo);
+
     }
 }

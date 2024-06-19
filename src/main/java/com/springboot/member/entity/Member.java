@@ -3,6 +3,7 @@ package com.springboot.member.entity;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
 
 /**
  *  - 멤버 변수 추가

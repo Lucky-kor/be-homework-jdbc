@@ -2,11 +2,14 @@ package com.springboot.order.controller;
 
 import com.springboot.coffee.service.CoffeeService;
 import com.springboot.order.dto.OrderPostDto;
-import com.springboot.order.dto.OrderResponseDto;
 import com.springboot.order.entity.Order;
 import com.springboot.order.mapper.OrderMapper;
 import com.springboot.order.service.OrderService;
+import com.springboot.response.PageResponseDtos;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v10/orders")
@@ -51,15 +52,13 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity getOrders() {
-        List<Order> orders = orderService.findOrders();
+    public ResponseEntity getOrders(@RequestParam(name="page",defaultValue ="1")int page,
+                                    @RequestParam(name="size",defaultValue ="1" )int size) {
+        Pageable pageable = PageRequest.of(page-1,size,Sort.by("orderId").descending());
 
-        List<OrderResponseDto> response =
-                orders.stream()
-                        .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
-                        .collect(Collectors.toList());
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            PageResponseDtos orderPageResponseDto = mapper
+                    .orderToPageResponseDtos(orderService.findOrders(pageable));
+        return new ResponseEntity<>(orderPageResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{order-id}")
