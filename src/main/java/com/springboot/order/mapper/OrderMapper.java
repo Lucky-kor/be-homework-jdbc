@@ -7,6 +7,8 @@ import com.springboot.order.dto.OrderCoffeeResponseDto;
 import com.springboot.order.dto.OrderPostDto;
 import com.springboot.order.dto.OrderResponseDto;
 import com.springboot.order.entity.Order;
+import com.springboot.page.PageInfo;
+import com.springboot.page.PageResponseDto;
 import org.mapstruct.Mapper;
 
 import java.time.LocalDateTime;
@@ -63,4 +65,17 @@ public interface OrderMapper {
                             orderCoffee.getQuantity());
                 }).collect(Collectors.toList());
     }
+
+    default PageResponseDto orderPageToOrderResponseDtos(CoffeeService coffeeService,
+                                                           List<Order> orders,
+                                                           int page, int size, long total){
+        PageResponseDto MemberPageResponseDto = PageResponseDto
+                .builder()
+                .data(orders.stream()
+                        .map(order -> orderToOrderResponseDto(coffeeService, order))
+                        .collect(Collectors.toList()))
+                .pageInfo(new PageInfo(page, size, total, (int)(total % size == 0 ? total / size : total / size + 1)))
+                .build();
+        return MemberPageResponseDto;
+    };
 }

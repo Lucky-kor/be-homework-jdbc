@@ -55,11 +55,12 @@ public class CoffeeController {
     }
 
     @GetMapping
-    public ResponseEntity getCoffees() {
-        List<Coffee> coffees = coffeeService.findCoffees();
+    public ResponseEntity getCoffees(@Positive @RequestParam int page,
+                                     @Positive @RequestParam int size ) {
+        List<Coffee> coffees = coffeeService.findCoffees(page, size);
         List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(mapper.coffeePageToCoffeeResponseDtos(coffees, page, size, coffeeService.totalCoffees()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{coffee-id}")
