@@ -6,6 +6,9 @@ import com.springboot.exception.ExceptionCode;
 import com.springboot.member.service.MemberService;
 import com.springboot.order.entity.Order;
 import com.springboot.order.repository.OrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,8 +45,9 @@ public class OrderService {
         return findVerifiedOrder(orderId);
     }
 
-    public List<Order> findOrders() {
-        return (List<Order>) orderRepository.findAll();
+    public Page<Order> findOrders(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("orderId").descending());
+        return orderRepository.findAll(pageRequest);
     }
 
     public void cancelOrder(long orderId) {
