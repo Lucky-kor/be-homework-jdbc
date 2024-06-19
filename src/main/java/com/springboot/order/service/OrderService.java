@@ -3,9 +3,13 @@ package com.springboot.order.service;
 import com.springboot.coffee.service.CoffeeService;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
+import com.springboot.member.entity.Member;
 import com.springboot.member.service.MemberService;
 import com.springboot.order.entity.Order;
 import com.springboot.order.repository.OrderRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -42,8 +46,12 @@ public class OrderService {
         return findVerifiedOrder(orderId);
     }
 
-    public List<Order> findOrders() {
-        return (List<Order>) orderRepository.findAll();
+
+    public Page<Order> findOrders(int page, int size) {
+        // TODO 페이지네이션을 적용하세요!
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("orderId").descending());
+        return orderRepository.findAll(pageRequest);
+        //return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
     }
 
     public void cancelOrder(long orderId) {

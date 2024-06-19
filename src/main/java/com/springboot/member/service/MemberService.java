@@ -4,9 +4,11 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -16,12 +18,15 @@ import java.util.Optional;
  *  - Spring Data JDBC 적용
  */
 @Service
+
 public class MemberService {
     private final MemberRepository memberRepository;
 
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
+
+
 
 
     public Member createMember(Member member) {
@@ -48,9 +53,11 @@ public class MemberService {
         return findVerifiedMember(memberId);
     }
 
-    public List<Member> findMembers() {
+    public Page<Member> findMembers(int page, int size) {
         // TODO 페이지네이션을 적용하세요!
-        return (List<Member>) memberRepository.findAll();
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("memberId").descending());
+        return memberRepository.findAll(pageRequest);
+        //return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
     }
 
     public void deleteMember(long memberId) {
