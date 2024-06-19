@@ -49,7 +49,7 @@ public class OrderService {
 
     public Page<Order> findOrders(Pageable pageable) {
 
-        return orderRepository.findAllByOrderByOrderId(pageable);
+        return orderRepository.findAll(pageable);
     }
 
     public void cancelOrder(long orderId) {

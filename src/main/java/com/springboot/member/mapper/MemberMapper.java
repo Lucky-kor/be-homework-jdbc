@@ -1,24 +1,22 @@
 package com.springboot.member.mapper;
 
-import com.springboot.member.dto.MemberPageResponseDtos;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
 import com.springboot.member.entity.Member;
-import com.springboot.PageInfo;
+import com.springboot.response.PageInfo;
+import com.springboot.response.PageResponseDtos;
 import org.mapstruct.Mapper;
 import org.springframework.data.domain.Page;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface MemberMapper {
     Member memberPostDtoToMember(MemberPostDto memberPostDto);
     Member memberPatchDtoToMember(MemberPatchDto memberPatchDto);
     MemberResponseDto memberToMemberResponseDto(Member member);
-    List<MemberResponseDto> membersToMemberResponseDtos(List<Member> members);
+    //List<MemberResponseDto> membersToMemberResponseDtos(List<Member> members);
 
-    default MemberPageResponseDtos membersToMemberPageResponseDto(Page<Member>members){
+    default PageResponseDtos membersToPageResponseDtos(Page<Member>members){
         //members.getContent() => List<Member>
       /*    MemberPageResponseDto memberPageResponseDto =
                  new MemberPageResponseDto(members.getContent(),new PageInfo());
@@ -32,10 +30,10 @@ public interface MemberMapper {
                         .build();
      */
         PageInfo pageInfo = new PageInfo(
-                members.getNumber(),
+                members.getNumber()+1,
                 members.getSize(),
                 members.getNumberOfElements(),
                 members.getTotalPages());
-        return new MemberPageResponseDtos(members.getContent(),pageInfo);
+        return new PageResponseDtos(members.getContent(),pageInfo);
     }
 }

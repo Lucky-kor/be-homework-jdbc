@@ -15,5 +15,5 @@ import java.util.Set;
 public interface OrderRepository extends PagingAndSortingRepository<Order, Long> {
 
     Page<Order> findAllByOrderByOrderId(Pageable pageable);
-   // Set<Order> findAll(Sort sort);
+
 }

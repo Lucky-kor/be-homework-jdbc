@@ -60,7 +60,7 @@ public class CoffeeService {
 
     public Page<Coffee> findCoffees(Pageable pageable) {
 
-        return coffeeRepository.findAllByOrderByCoffeeIdDesc(pageable);
+        return coffeeRepository.findAll(pageable);
     }
 
     public void deleteCoffee(long coffeeId) {

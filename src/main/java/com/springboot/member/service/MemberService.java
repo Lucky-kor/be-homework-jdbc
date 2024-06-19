@@ -7,6 +7,7 @@ import com.springboot.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -54,7 +55,7 @@ public class MemberService {
 
     public Page<Member> findMembers(Pageable pageable) {
         // TODO 페이지네이션을 적용하세요!
-        return memberRepository.findAllByOrderByMemberIdDesc(pageable);
+        return memberRepository.findAll(pageable);
     }
 
     public void deleteMember(long memberId) {
