@@ -5,8 +5,13 @@ import com.springboot.coffee.dto.CoffeePostDto;
 import com.springboot.coffee.dto.CoffeeResponseDto;
 import com.springboot.coffee.entity.Coffee;
 import com.springboot.coffee.mapper.CoffeeMapper;
+import com.springboot.coffee.repository.CoffeeRepository;
 import com.springboot.coffee.service.CoffeeService;
+import com.springboot.response.PageInfo;
+import com.springboot.response.MultiResponseDto;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,17 +22,20 @@ import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/v10/coffees")
 @Validated
 public class CoffeeController {
     private final static String COFFEE_DEFAULT_URL = "/v10/coffees";
+    private final CoffeeRepository coffeeRepository;
     private CoffeeService coffeeService;
     private CoffeeMapper mapper;
 
-    public CoffeeController(CoffeeService coffeeService, CoffeeMapper coffeeMapper) {
+    public CoffeeController(CoffeeService coffeeService, CoffeeMapper coffeeMapper, CoffeeRepository coffeeRepository) {
         this.coffeeService = coffeeService;
         this.mapper = coffeeMapper;
+        this.coffeeRepository = coffeeRepository;
     }
 
     @PostMapping
@@ -55,11 +63,14 @@ public class CoffeeController {
     }
 
     @GetMapping
-    public ResponseEntity getCoffees() {
-        List<Coffee> coffees = coffeeService.findCoffees();
-        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
+    public ResponseEntity getCoffees(@Positive int page,
+                                     @Positive int size) {
+        Page<Coffee> coffeePage = coffeeRepository.findAll(PageRequest.of(page - 1,size));
+        PageInfo pageInfo = new PageInfo(page, size, coffeePage.getNumberOfElements(), coffeePage.getTotalPages());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        List<Coffee> coffees = coffeePage.getContent();
+        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
+        return new ResponseEntity<>(new MultiResponseDto<>(coffees, pageInfo), HttpStatus.OK);
     }
 
     @DeleteMapping("/{coffee-id}")

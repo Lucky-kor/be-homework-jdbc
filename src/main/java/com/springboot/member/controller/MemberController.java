@@ -6,8 +6,10 @@ import com.springboot.member.dto.MemberResponseDto;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
+import com.springboot.response.MultiResponseDto;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -71,10 +73,13 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
+    public ResponseEntity getMembers(@Positive @RequestParam int page,
+                                     @Positive @RequestParam int size) {
         // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+        Page<Member> memberPage = memberService.findMembers(page - 1,size);
+        List<Member> members = memberPage.getContent();
+        List<MemberResponseDto> responseDto = mapper.membersToMemberResponseDtos(members);
+        MultiResponseDto response = new MultiResponseDto<>(responseDto,memberPage);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

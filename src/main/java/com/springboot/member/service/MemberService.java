@@ -4,6 +4,8 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,9 +39,9 @@ public class MemberService {
 
         // TODO 리팩토링 포인트
         Optional.ofNullable(member.getName())
-                .ifPresent(name -> findMember.setName(name));
+                .ifPresent(findMember::setName);
         Optional.ofNullable(member.getPhone())
-                .ifPresent(phone -> findMember.setPhone(phone));
+                .ifPresent(findMember::setPhone);
 
         return memberRepository.save(findMember);
     }
@@ -48,9 +50,9 @@ public class MemberService {
         return findVerifiedMember(memberId);
     }
 
-    public List<Member> findMembers() {
+    public List<Member> findMembers(Page<Member> memberPage) {
         // TODO 페이지네이션을 적용하세요!
-        return (List<Member>) memberRepository.findAll();
+        return memberPage.getContent();
     }
 
     public void deleteMember(long memberId) {
@@ -71,5 +73,10 @@ public class MemberService {
         Optional<Member> member = memberRepository.findByEmail(email);
         if (member.isPresent())
             throw new BusinessLogicException(ExceptionCode.MEMBER_EXISTS);
+    }
+
+    public Page<Member> findMembers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page , size);
+        return memberRepository.findAllByOrderByMemberIdAsc(pageRequest);
     }
 }
