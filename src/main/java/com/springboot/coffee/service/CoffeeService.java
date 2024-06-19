@@ -5,6 +5,9 @@ import com.springboot.coffee.repository.CoffeeRepository;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.order.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,8 +59,9 @@ public class CoffeeService {
                 .collect(Collectors.toList());
     }
 
-    public List<Coffee> findCoffees() {
-        return (List<Coffee>) coffeeRepository.findAll();
+    public Page<Coffee> findCoffees(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page-1,size,Sort.Direction.DESC,"coffeeId");
+        return coffeeRepository.findAll(pageRequest);
     }
 
     public void deleteCoffee(long coffeeId) {
