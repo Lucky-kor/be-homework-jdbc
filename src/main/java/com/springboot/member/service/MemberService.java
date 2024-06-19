@@ -4,6 +4,8 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,6 +55,10 @@ public class MemberService {
         return (List<Member>) memberRepository.findAll();
     }
 
+    public Page<Member> findMembers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
+    }
     public void deleteMember(long memberId) {
         Member findMember = findVerifiedMember(memberId);
 
