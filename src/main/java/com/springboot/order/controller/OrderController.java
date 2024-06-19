@@ -1,12 +1,19 @@
 package com.springboot.order.controller;
 
+import com.springboot.PageInfo;
+import com.springboot.coffee.dto.CoffeeResponseDto;
 import com.springboot.coffee.service.CoffeeService;
+import com.springboot.order.dto.OrderCoffeeResponseDto;
 import com.springboot.order.dto.OrderPostDto;
 import com.springboot.order.dto.OrderResponseDto;
+import com.springboot.order.dto.OrderResponseDto2;
 import com.springboot.order.entity.Order;
+import com.springboot.order.entity.OrderCoffee;
 import com.springboot.order.mapper.OrderMapper;
 import com.springboot.order.service.OrderService;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -50,7 +59,7 @@ public class OrderController {
                 HttpStatus.OK);
     }
 
-    @GetMapping
+    /*@GetMapping
     public ResponseEntity getOrders() {
         List<Order> orders = orderService.findOrders();
 
@@ -60,6 +69,27 @@ public class OrderController {
                         .collect(Collectors.toList());
 
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }*/
+    @GetMapping
+    public ResponseEntity getOrders(@RequestParam @Positive int pageNumber,
+                                    @RequestParam @Positive int pageSize){
+        Page<Order> orderPage = orderService.findOrders(pageNumber-1, pageSize);
+        List<Order> orders = orderPage.getContent();
+        PageInfo pageInfo = PageInfo.builder()
+                .page(pageNumber)
+                .size(pageSize)
+                .totalElements(orderPage.getNumberOfElements())
+                .totalPages(orderPage.getTotalPages())
+                .build();
+
+
+        List<OrderResponseDto> orderResponseDtos = orders.stream()
+                .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
+                .collect(Collectors.toList());
+        OrderResponseDto2 orderResponseDto2 = new OrderResponseDto2(orderResponseDtos, pageInfo);
+
+
+        return new ResponseEntity<>(orderResponseDto2, HttpStatus.OK);
     }
 
     @DeleteMapping("/{order-id}")

@@ -1,13 +1,15 @@
 package com.springboot.member.service;
 
+import com.springboot.MyPage;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * V2
@@ -48,9 +50,31 @@ public class MemberService {
         return findVerifiedMember(memberId);
     }
 
-    public List<Member> findMembers() {
+    public List<Member> findMembers(MyPage myPage) {
         // TODO 페이지네이션을 적용하세요!
-        return (List<Member>) memberRepository.findAll();
+        // 전체 멤버 목록
+        ArrayList<Member> allMembers = (ArrayList<Member>) memberRepository.findAll();
+        // subList로 자르기
+        ArrayList<Member> pagedMembers;
+        if(allMembers.size() >= myPage.getStartIndex()){
+            int from = myPage.getStartIndex();
+            int tempTo = from + myPage.getPageSize();
+            int to = Math.min(allMembers.size(), tempTo);
+            pagedMembers = new ArrayList<>(allMembers.subList(from, to));
+        }else{
+            throw new BusinessLogicException(ExceptionCode.PAGE_NOT_FOUND);
+        }
+        // 내림차순 전환
+        Collections.reverse(pagedMembers);
+        return pagedMembers;
+    }
+    public Page<Member> findMembers(int page, int size){
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
+    }
+    public int getTotalElements(){
+        ArrayList<Member> allMembers = (ArrayList<Member>) memberRepository.findAll();
+        return allMembers.size();
     }
 
     public void deleteMember(long memberId) {
