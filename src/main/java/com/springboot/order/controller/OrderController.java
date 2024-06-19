@@ -6,7 +6,10 @@ import com.springboot.order.dto.OrderResponseDto;
 import com.springboot.order.entity.Order;
 import com.springboot.order.mapper.OrderMapper;
 import com.springboot.order.service.OrderService;
+import com.springboot.pageresponsedto.PageInfo;
+import com.springboot.pageresponsedto.PageResponseDto;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -49,18 +52,31 @@ public class OrderController {
         return new ResponseEntity<>(mapper.orderToOrderResponseDto(coffeeService, order),
                 HttpStatus.OK);
     }
-
     @GetMapping
-    public ResponseEntity getOrders() {
-        List<Order> orders = orderService.findOrders();
+    public ResponseEntity getOrders(@Positive @RequestParam int page,
+                                    @Positive @RequestParam int size){
+        Page<Order> orderPage = orderService.findOrders(page,size);
+        PageInfo pageInfo = new PageInfo(page,size, orderPage.getNumberOfElements(), orderPage.getTotalPages());
+        List<Order> orders = orderPage.getContent();
 
-        List<OrderResponseDto> response =
-                orders.stream()
-                        .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
-                        .collect(Collectors.toList());
+        List<OrderResponseDto> orderResponseDtos = orders.stream()
+                .map(order -> mapper.orderToOrderResponseDto(coffeeService,order))
+                .collect(Collectors.toList());
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity (new PageResponseDto(orderResponseDtos,pageInfo),HttpStatus.OK);
     }
+
+//    @GetMapping
+//    public ResponseEntity getOrders() {
+//        List<Order> orders = orderService.findOrders();
+//
+//        List<OrderResponseDto> response =
+//                orders.stream()
+//                        .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
+//                        .collect(Collectors.toList());
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
     @DeleteMapping("/{order-id}")
     public ResponseEntity cancelOrder(@PathVariable("order-id") @Positive long orderId) {

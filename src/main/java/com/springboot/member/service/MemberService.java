@@ -6,6 +6,7 @@ import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,9 +57,10 @@ public class MemberService {
     }
 
     public Page<Member> findMembers(int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size);
-        return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
+        PageRequest pageRequest = PageRequest.of(page-1, size, Sort.Direction.DESC,"memberId");
+        return memberRepository.findAll(pageRequest);
     }
+
     public void deleteMember(long memberId) {
         Member findMember = findVerifiedMember(memberId);
 

@@ -2,7 +2,9 @@ package com.springboot.member.controller;
 
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
-import com.springboot.member.dto.PageResponseDto;
+import com.springboot.member.dto.MemberResponseDto;
+import com.springboot.pageresponsedto.PageInfo;
+import com.springboot.pageresponsedto.PageResponseDto;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -74,9 +78,12 @@ public class MemberController {
             @Positive @RequestParam int page,
             @Positive @RequestParam int size
     ) {
-        Page<Member> members = memberService.findMembers(page-1,size);
-        PageResponseDto response = mapper.memberPageToPageResponseDto(members);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Page<Member> memberPage = memberService.findMembers(page ,size);
+        PageInfo pageInfo = new PageInfo(page,size,memberPage.getNumberOfElements(),memberPage.getTotalPages());
+        List<Member> members = memberPage.getContent();
+        List<MemberResponseDto> memberResponseDtos =  mapper.membersToMemberResponseDtos(members);
+        return new ResponseEntity<>( new PageResponseDto(memberResponseDtos,pageInfo),HttpStatus.OK);
+
     }
 
 //    @GetMapping
