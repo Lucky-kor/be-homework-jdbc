@@ -1,7 +1,9 @@
 package com.springboot.order.repository;
 
+import com.springboot.member.entity.Member;
 import com.springboot.order.entity.Order;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
-public interface OrderRepository extends CrudRepository<Order, Long> {
+public interface OrderRepository extends CrudRepository<Order, Long>, PagingAndSortingRepository<Order, Long> {
 }
