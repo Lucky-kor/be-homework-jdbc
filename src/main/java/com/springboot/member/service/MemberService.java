@@ -4,10 +4,13 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * V2
@@ -48,9 +51,22 @@ public class MemberService {
         return findVerifiedMember(memberId);
     }
 
-    public List<Member> findMembers() {
+    public List<Member> findMembers(int page, int size) {
         // TODO 페이지네이션을 적용하세요!
-        return (List<Member>) memberRepository.findAll();
+        List<Member> findMembers = (List<Member>) memberRepository.findAll();
+        Collections.reverse(findMembers);
+        List<Member> returnMembers = findMembers.subList(page * size, page * size + size);
+        return returnMembers;
+    }
+    public Page<Member> findPageMembers(int page, int size) {
+        // TODO 페이지네이션을 적용하세요!
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("memberId")));
+        return memberRepository.findAll(pageable);
+    }
+
+    public int memberCount(){
+        List<Member> findMembers = (List<Member>) memberRepository.findAll();
+        return findMembers.size();
     }
 
     public void deleteMember(long memberId) {
