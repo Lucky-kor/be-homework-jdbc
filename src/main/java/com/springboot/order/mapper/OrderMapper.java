@@ -1,6 +1,7 @@
 package com.springboot.order.mapper;
 
 import com.springboot.coffee.entity.Coffee;
+import com.springboot.order.dto.OrdersResponseDto;
 import com.springboot.order.entity.OrderCoffee;
 import com.springboot.coffee.service.CoffeeService;
 import com.springboot.order.dto.OrderCoffeeResponseDto;
@@ -10,6 +11,7 @@ import com.springboot.order.entity.Order;
 import org.mapstruct.Mapper;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -50,6 +52,14 @@ public interface OrderMapper {
         return orderResponseDto;
     }
 
+   default List<OrderResponseDto> orderResponseDtoToOrderResponseDtoList(CoffeeService coffeeService, List<Order> orders){
+       return orders.stream()
+               .map(order -> orderToOrderResponseDto(coffeeService,order))
+               .collect(Collectors.toList());
+   }
+
+
+
     default List<OrderCoffeeResponseDto> orderToOrderCoffeeResponseDto(
             CoffeeService coffeeService,
             Set<OrderCoffee> orderCoffees) {
@@ -63,4 +73,6 @@ public interface OrderMapper {
                             orderCoffee.getQuantity());
                 }).collect(Collectors.toList());
     }
+
+
 }

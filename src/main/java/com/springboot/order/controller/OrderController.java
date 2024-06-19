@@ -1,12 +1,18 @@
 package com.springboot.order.controller;
 
 import com.springboot.coffee.service.CoffeeService;
+import com.springboot.member.dto.MemberResponseDto;
+import com.springboot.member.dto.MembersResponseDto;
+import com.springboot.member.dto.PageInfoResponseDto;
+import com.springboot.member.entity.Member;
 import com.springboot.order.dto.OrderPostDto;
 import com.springboot.order.dto.OrderResponseDto;
+import com.springboot.order.dto.OrdersResponseDto;
 import com.springboot.order.entity.Order;
 import com.springboot.order.mapper.OrderMapper;
 import com.springboot.order.service.OrderService;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,13 +57,33 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity getOrders() {
-        List<Order> orders = orderService.findOrders();
+    public ResponseEntity getOrders(@Positive @RequestParam int page,
+                                    @Positive @RequestParam int size) {
+//        List<Order> orders = orderService.findOrders();
+//
+//        List<OrderResponseDto> response =
+//                orders.stream()
+//                        .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
+//                        .collect(Collectors.toList());
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
 
-        List<OrderResponseDto> response =
-                orders.stream()
-                        .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
-                        .collect(Collectors.toList());
+        Page<Order> orderPage = orderService.findPageOrders(page-1, size);
+
+
+        List<OrderResponseDto> orderResponseDtoList = mapper.orderResponseDtoToOrderResponseDtoList(coffeeService, orderPage.getContent());
+
+        PageInfoResponseDto pageInfo = PageInfoResponseDto.builder()
+                .page(page )
+                .size(size)
+                .totalElements(orderPage.getTotalElements())
+                .totalPages(orderPage.getTotalPages())
+                .build();
+
+        OrdersResponseDto response = OrdersResponseDto.builder()
+                .orderData(orderResponseDtoList)
+                .pageInfo(pageInfo)
+                .build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

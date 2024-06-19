@@ -1,17 +1,20 @@
 package com.springboot.member.controller;
 
-import com.springboot.member.dto.MemberPatchDto;
-import com.springboot.member.dto.MemberPostDto;
-import com.springboot.member.dto.MemberResponseDto;
+import com.springboot.member.dto.*;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -71,10 +74,17 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
+    public ResponseEntity getMembers(@Positive @RequestParam int page,
+                                     @Positive @RequestParam int size) {
         // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+//        List<Member> members = memberService.findMembers(page - 1 , size);
+//        MembersResponseDto response = mapper.membersToMembersResponseDto(memberService, members , page -1 ,size);
+       Page<Member> memberPage = memberService.findPageMembers(page - 1, size);
+
+       List <MemberResponseDto> memberResponseDtos = mapper.membersToMemberResponseDtos(memberPage.getContent());
+
+        MembersResponseDto response = new MembersResponseDto(memberResponseDtos, memberPage);
+
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
