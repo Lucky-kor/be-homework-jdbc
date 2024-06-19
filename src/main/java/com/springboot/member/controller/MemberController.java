@@ -3,11 +3,13 @@ package com.springboot.member.controller;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
+import com.springboot.PageInfo;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -70,13 +72,42 @@ public class MemberController {
                 , HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity getMembers() {
+    /*@GetMapping
+    public ResponseEntity getMembers(@RequestParam @Positive int pageNumber, @RequestParam @Positive int pageSize) {
         // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+        // 페이지 객체 생성
+        Page page = Page.builder()
+                .pageNumber(pageNumber).pageSize(pageSize)
+                .build();
+        // 페이지 정보 전달하여 가져오기
+        List<Member> members = memberService.findMembers(page);
+        int totalElements = memberService.getTotalElements();
+        PageInfo pageInfo = PageInfo.builder()
+                .page(pageNumber)
+                .size(pageSize)
+                .totalElements(totalElements)
+                .totalPages(totalElements / pageSize + 1)
+                .build();
+                *//*new PageInfo(pageNumber,pageSize,totalElements,totalElements / pageSize + 1);*//*
+        MemberResponseDto responseDto = MemberResponseDto.builder()
+                .data(members)
+                .pageInfo(pageInfo)
+                .build();*//*new MemberResponseDto(members, pageInfo);*//*
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }*/
+    @GetMapping
+    public ResponseEntity getMembers(@RequestParam @Positive int pageNumber,
+                                     @RequestParam @Positive int pageSize){
+        Page<Member> memberPage = memberService.findMembers(pageNumber-1, pageSize);
+        PageInfo pageInfo = PageInfo.builder()
+                .page(pageNumber)
+                .size(pageSize)
+                .totalElements(memberService.getTotalElements())
+                .totalPages(memberPage.getTotalPages())
+                .build();/*new PageInfo(pageNumber,pageSize, (int) memberPage.getTotalElements(), memberPage.getTotalPages());*/
+        List<Member> members = memberPage.getContent();
+        return new ResponseEntity<>(new MemberResponseDto(members, pageInfo), HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
