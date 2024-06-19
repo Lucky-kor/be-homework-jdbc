@@ -7,12 +7,12 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 @Getter
 public class PageResponseDto {
-    private Object data;
+    private List<MemberResponseDto> members;
 
     private PageInfo pageInfo;
 
-    private PageResponseDto(Object data, Page page) {
-        this.data = data;
+    private PageResponseDto(List<MemberResponseDto> members, Page page) {
+        this.members = members;
         this.pageInfo =
                 new PageInfo(
                         page.getNumber()+1,
@@ -21,8 +21,8 @@ public class PageResponseDto {
                         page.getTotalPages()
                 );
     }
-    public static PageResponseDto of(Object data, Page page) {
-        return new PageResponseDto(data, page);
+    public static PageResponseDto of(List<MemberResponseDto> members, Page page) {
+        return new PageResponseDto(members, page);
     }
     @AllArgsConstructor
     @Getter

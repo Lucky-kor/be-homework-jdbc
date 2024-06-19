@@ -24,8 +24,7 @@ public interface MemberMapper {
 
     default PageResponseDto memberPageToPageResponseDto(Page<Member> members) {
         return PageResponseDto.of(
-                membersToMemberResponseDtos(members.getContent()),
-                members
+                membersToMemberResponseDtos(members.getContent()),members
         );
 
 //    Repository 계층에서 받은 Page<Member> 객체를 매개변수로
