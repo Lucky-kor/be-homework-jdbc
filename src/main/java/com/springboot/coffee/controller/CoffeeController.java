@@ -1,12 +1,14 @@
 package com.springboot.coffee.controller;
 
+import com.springboot.coffee.dto.CoffeePageResponseDtos;
 import com.springboot.coffee.dto.CoffeePatchDto;
 import com.springboot.coffee.dto.CoffeePostDto;
-import com.springboot.coffee.dto.CoffeeResponseDto;
 import com.springboot.coffee.entity.Coffee;
 import com.springboot.coffee.mapper.CoffeeMapper;
 import com.springboot.coffee.service.CoffeeService;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v10/coffees")
@@ -55,9 +56,12 @@ public class CoffeeController {
     }
 
     @GetMapping
-    public ResponseEntity getCoffees() {
-        List<Coffee> coffees = coffeeService.findCoffees();
-        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
+    public ResponseEntity getCoffees(@Positive @RequestParam(name="page",defaultValue = "1") int page,
+                                     @Positive @RequestParam(name="size",defaultValue = "1") int size) {
+        Pageable pageable = PageRequest.of(page,size);
+        CoffeePageResponseDtos response = mapper.CoffeesToCoffeePageResponseDtos(coffeeService.findCoffees(pageable));
+//        List<Coffee> coffees = coffeeService.findCoffees();
+//        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

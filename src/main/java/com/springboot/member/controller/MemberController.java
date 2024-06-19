@@ -1,13 +1,15 @@
 package com.springboot.member.controller;
 
+import com.springboot.member.dto.MemberPageResponseDtos;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
-import com.springboot.member.dto.MemberResponseDto;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
-import java.util.List;
 
 
 /**
@@ -71,12 +72,12 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
+    public ResponseEntity getMembers(@Positive @RequestParam(name="page",defaultValue = "1") int page,
+                                     @Positive @RequestParam(name="size",defaultValue = "1") int size) {
         // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Pageable pageable = PageRequest.of(page,size);
+        MemberPageResponseDtos memberPageResponseDtos = mapper.membersToMemberPageResponseDto(memberService.findMembers(pageable));
+        return new ResponseEntity<>(memberPageResponseDtos, HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
