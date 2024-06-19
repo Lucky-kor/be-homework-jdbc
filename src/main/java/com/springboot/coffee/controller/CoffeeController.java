@@ -1,12 +1,16 @@
 package com.springboot.coffee.controller;
 
+
 import com.springboot.coffee.dto.CoffeePatchDto;
 import com.springboot.coffee.dto.CoffeePostDto;
 import com.springboot.coffee.dto.CoffeeResponseDto;
 import com.springboot.coffee.entity.Coffee;
 import com.springboot.coffee.mapper.CoffeeMapper;
 import com.springboot.coffee.service.CoffeeService;
+import com.springboot.PageResponseDto;
+import com.springboot.member.page.PageInfo;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -55,11 +59,15 @@ public class CoffeeController {
     }
 
     @GetMapping
-    public ResponseEntity getCoffees() {
-        List<Coffee> coffees = coffeeService.findCoffees();
+    public ResponseEntity getCoffees(@Positive @RequestParam int page,
+                                     @Positive @RequestParam int size) {
+        Page<Coffee> coffeePage = coffeeService.findCoffees(page -1, size);
+        PageInfo pageInfo = new PageInfo(page, size,(int)coffeePage.getTotalElements()
+                ,coffeePage.getTotalPages() );
+        List<Coffee> coffees = coffeePage.getContent();
         List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(new PageResponseDto<>(response, pageInfo), HttpStatus.OK);
     }
 
     @DeleteMapping("/{coffee-id}")

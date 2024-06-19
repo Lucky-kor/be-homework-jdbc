@@ -1,8 +1,9 @@
 package com.springboot.member.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.springboot.member.dto.MemberPostDto;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 /**
  *  - 멤버 변수 추가
@@ -11,6 +12,9 @@ import org.springframework.data.annotation.Id;
  */
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Member {
     @Id
     private Long memberId;
@@ -20,4 +24,7 @@ public class Member {
     private String name;
 
     private String phone;
+
+
+
 }

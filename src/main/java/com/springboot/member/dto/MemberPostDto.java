@@ -1,6 +1,8 @@
 package com.springboot.member.dto;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -8,6 +10,8 @@ import javax.validation.constraints.Pattern;
 
 // TODO 변경: Setter 없앰
 @Getter
+@NoArgsConstructor
+@Data
 public class MemberPostDto {
     @NotBlank
     @Email
@@ -19,4 +23,12 @@ public class MemberPostDto {
     @Pattern(regexp = "^010-\\d{3,4}-\\d{4}$",
             message = "휴대폰 번호는 010으로 시작하는 11자리 숫자와 '-'로 구성되어야 합니다.")
     private String phone;
+
+    public MemberPostDto(MemberPostDto memberPostDto){
+        this.email = memberPostDto.getEmail();
+        this.name = memberPostDto.getName();
+        this.phone = memberPostDto.getPhone();
+    }
+
 }
+
