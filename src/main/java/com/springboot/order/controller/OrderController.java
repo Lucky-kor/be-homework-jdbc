@@ -6,7 +6,9 @@ import com.springboot.order.dto.OrderResponseDto;
 import com.springboot.order.entity.Order;
 import com.springboot.order.mapper.OrderMapper;
 import com.springboot.order.service.OrderService;
+import com.springboot.response.MultiResponseDto;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -51,14 +53,17 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity getOrders() {
-        List<Order> orders = orderService.findOrders();
+    public ResponseEntity getOrders(@Positive @RequestParam int page,
+                                    @Positive @RequestParam int size) {
+        Page<Order> pageOrders = orderService.findOrders(page, size);
+        List<Order> orders = pageOrders.getContent();
 
-        List<OrderResponseDto> response =
+        List<OrderResponseDto> responseDto =
                 orders.stream()
                         .map(order -> mapper.orderToOrderResponseDto(coffeeService, order))
                         .collect(Collectors.toList());
 
+        MultiResponseDto response = new MultiResponseDto(responseDto, pageOrders);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
