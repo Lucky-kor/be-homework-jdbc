@@ -2,6 +2,7 @@ package com.springboot.response;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -14,9 +15,14 @@ public class MultiResponseDto<T> {
     private List<T> data;
     private PageInfo pageInfo;
 
-    // page 를 받아야 한다고??
-    public MultiResponseDto(List<T> data, PageInfo pageInfo) {
+//    public MultiResponseDto(List<T> data, PageInfo pageInfo) {
+//        this.data = data;
+//        this.pageInfo = pageInfo;
+//    }
+
+    public MultiResponseDto(List<T> data, Page page) {
         this.data = data;
-        this.pageInfo = pageInfo;
+        this.pageInfo = new PageInfo(page.getNumber() + 1, page.getSize(),
+                page.getTotalElements(), page.getTotalPages());
     }
 }

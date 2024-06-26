@@ -1,7 +1,6 @@
 package com.springboot.coffee.repository;
-
+//괴도왔다감
 import com.springboot.coffee.entity.Coffee;
-import com.springboot.member.entity.Member;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;

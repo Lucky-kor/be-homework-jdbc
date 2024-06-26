@@ -63,9 +63,9 @@ public class CoffeeController {
         Page<Coffee> coffeePage = coffeeService.findCoffees(page -1, size);
         List<Coffee> coffees = coffeePage.getContent();
         List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
-        PageInfo pageInfo = new PageInfo(page, size, coffeePage.getNumberOfElements(), coffeePage.getTotalPages() );
+//        PageInfo pageInfo = new PageInfo(page, size, coffeePage.getNumberOfElements(), coffeePage.getTotalPages() );
 
-        return new ResponseEntity<>(new MultiResponseDto(response, pageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto(response, coffeePage), HttpStatus.OK);
     }
 
     @DeleteMapping("/{coffee-id}")

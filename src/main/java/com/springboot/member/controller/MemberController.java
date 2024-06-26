@@ -82,12 +82,12 @@ public class MemberController {
         // TODO 페이지네이션을 적용하세요!
         // page 1 페이지를 주세요 ! 하면 controller 에서는 0으로 받아서 관리해야 함.
         // 1번째 페이지가 0번 인덱스 같은 느낌.
-        Page<Member> memberPage = memberService.findMembers(page -1, size);
+        Page<Member> memberPage = memberService.findMembers(page - 1, size);
         List<Member> members = memberPage.getContent();
         List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
-        PageInfo pageInfo = new PageInfo(page, size, memberPage.getNumberOfElements(), memberPage.getTotalPages() );
+//        PageInfo pageInfo = new PageInfo(page, size, memberPage.getNumberOfElements(), memberPage.getTotalPages() );
         // pageResponseDto 라는 틀 안에 resp
-        return new ResponseEntity<>(new MultiResponseDto(response, pageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto(response, memberPage), HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")

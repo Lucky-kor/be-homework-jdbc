@@ -81,12 +81,15 @@ public class CoffeeService {
 
     private void verifyExistCoffee(String coffeeCode) {
         Optional<Coffee> coffee = coffeeRepository.findByCoffeeCode(coffeeCode);
+        // void 면 던져버려야 하니까. throw 를 해도 되는데,
+        // 타입이 주어지면 이렇게 쓰면 안됨.
         if(coffee.isPresent())
             throw new BusinessLogicException(ExceptionCode.COFFEE_CODE_EXISTS);
     }
 
     private Coffee findVerifiedCoffeeByQuery(long coffeeId) {
         Optional<Coffee> optionalCoffee = coffeeRepository.findByCoffee(coffeeId);
+        // 얘는 변수를 선언해서
         Coffee findCoffee =
                 optionalCoffee.orElseThrow(() ->
                         new BusinessLogicException(ExceptionCode.COFFEE_NOT_FOUND));

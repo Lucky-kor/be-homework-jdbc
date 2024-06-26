@@ -64,9 +64,9 @@ public class OrderController {
                         .collect(Collectors.toList());
 
 
-        PageInfo pageInfo = new PageInfo(page, size, orderPage.getNumberOfElements(), orderPage.getTotalPages() );
+//        PageInfo pageInfo = new PageInfo(page, size, orderPage.getNumberOfElements(), orderPage.getTotalPages() );
 
-        return new ResponseEntity<>(new MultiResponseDto(response, pageInfo), HttpStatus.OK);
+        return new ResponseEntity<>(new MultiResponseDto(response, orderPage), HttpStatus.OK);
     }
 
     @DeleteMapping("/{order-id}")
