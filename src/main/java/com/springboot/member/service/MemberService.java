@@ -4,6 +4,8 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Optional;
  *  - 메서드 구현
  *  - DI 적용
  *  - Spring Data JDBC 적용
+
  */
 @Service
 public class MemberService {
@@ -22,6 +25,7 @@ public class MemberService {
     public MemberService(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
+
 
 
     public Member createMember(Member member) {
@@ -51,6 +55,11 @@ public class MemberService {
     public List<Member> findMembers() {
         // TODO 페이지네이션을 적용하세요!
         return (List<Member>) memberRepository.findAll();
+    }
+
+    public Page<Member> findsMembers(int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
     }
 
     public void deleteMember(long memberId) {

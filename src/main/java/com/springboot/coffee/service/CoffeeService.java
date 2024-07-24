@@ -4,7 +4,10 @@ import com.springboot.coffee.entity.Coffee;
 import com.springboot.coffee.repository.CoffeeRepository;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
+import com.springboot.member.entity.PageInfo;
 import com.springboot.order.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,6 +51,11 @@ public class CoffeeService {
         return findVerifiedCoffeeByQuery(coffeeId);
     }
 
+
+    public Page<Coffee> findCoffees(int page , int size) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return coffeeRepository.findAllByOrderByCoffeeIdDesc(pageRequest);
+    }
     // 주문에 해당하는 커피 정보 조회
     public List<Coffee> findOrderedCoffees(Order order) {
         return order.getOrderCoffees()

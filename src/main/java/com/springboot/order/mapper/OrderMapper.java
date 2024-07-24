@@ -33,14 +33,12 @@ public interface OrderMapper {
     default OrderResponseDto orderToOrderResponseDto(CoffeeService coffeeService,
                                                      Order order) {
 
-        long memberId = order.getMemberId();
-
         List<OrderCoffeeResponseDto> orderCoffees =
                 orderToOrderCoffeeResponseDto(coffeeService, order.getOrderCoffees());
 
         OrderResponseDto orderResponseDto = new OrderResponseDto();
         orderResponseDto.setOrderCoffees(orderCoffees);
-        orderResponseDto.setMemberId(memberId);
+        orderResponseDto.setMemberId(order.getMemberId());
         orderResponseDto.setCreatedAt(order.getCreatedAt());
         orderResponseDto.setOrderId(order.getOrderId());
         orderResponseDto.setOrderStatus(order.getOrderStatus());
