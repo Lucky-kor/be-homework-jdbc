@@ -1,13 +1,16 @@
 package com.springboot.member.controller;
 
+import com.springboot.page.MultiPageDto;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
+import com.springboot.page.PageInfo;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -70,14 +73,29 @@ public class MemberController {
                 , HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity getMembers() {
-        // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+//    @GetMapping
+//    public ResponseEntity getMembers() {
+//        // TODO 페이지네이션을 적용하세요!
+//        List<Member> members = memberService.findMembers();
+//        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+//
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//    }
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+@GetMapping
+public ResponseEntity getMembers(@Positive @RequestParam int page,
+                                 @Positive @RequestParam int size) {
+    // page information
+//    page는 0부터 시작이기 때문에 page -1로 설정한다.
+    Page<Member> memberPage = memberService.findMembers(page -1, size);
+    PageInfo pageInfo = new PageInfo(page + 1, size, memberPage.getTotalElements(), memberPage.getTotalPages());
+
+//    members 반환 + dto로 반환
+    List<Member> members = memberPage.getContent();
+    List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+
+    return new ResponseEntity<>(new MultiPageDto (response, pageInfo), HttpStatus.OK);
+}
 
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(
