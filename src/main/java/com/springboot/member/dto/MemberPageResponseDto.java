@@ -8,10 +8,12 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
+//
 @Getter
 @Builder
 public class MemberPageResponseDto {
 
+    //1page 정보 : List ->
     private List<MemberResponseDto> data;
     private PageInfo pageInfo;
 

@@ -5,6 +5,10 @@ import com.springboot.coffee.repository.CoffeeRepository;
 import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.order.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,8 +60,15 @@ public class CoffeeService {
                 .collect(Collectors.toList());
     }
 
-    public List<Coffee> findCoffees() {
-        return (List<Coffee>) coffeeRepository.findAll();
+    public Page<Coffee> findCoffees(int page, int size) {
+
+        //findAll메서드를 사용하기 위해 Page의 매개변수 Pageable 타입 생성
+        //Pageable은 인터페이스고 그 구현체인 PageRequest를 사용
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.Direction.DESC, "coffeeId");
+        Page<Coffee> coffeePage = coffeeRepository.findAll(pageable);
+
+
+        return coffeePage;
     }
 
     public void deleteCoffee(long coffeeId) {

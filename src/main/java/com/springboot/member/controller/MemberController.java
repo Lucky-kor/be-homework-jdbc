@@ -1,9 +1,10 @@
 package com.springboot.member.controller;
 
-import com.springboot.member.dto.MemberPageResponseDto;
+
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
+import com.springboot.member.dto.PageDto;
 import com.springboot.member.entity.Member;
 import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
@@ -80,16 +81,18 @@ public class MemberController {
         Page<Member> members = memberService.findMembers(page, size); //findMember가 param으로 받을 타입과 어떤 일을 할지 정해놓으니 받으면 그 기능에 적용됨
         Page<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
 
-        MemberPageResponseDto dto = MemberPageResponseDto.builder()
+        PageDto<MemberResponseDto> dto = PageDto.<MemberResponseDto>builder()
                 .data(mapper.pageToList(response))
-                .pageInfo(MemberPageResponseDto.PageInfo.builder()
+                .pageInfo(PageDto.PageInfo.builder()
                         .page(page)
                         .size(size)
-                        .totalElements((int)members.getTotalElements())
+                        .totalElements((int)members.getTotalElements()) //강제 형변환
                         .totalPages(members.getTotalPages())
                         .build()
                 )
                 .build();
+
+
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 

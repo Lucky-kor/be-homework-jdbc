@@ -6,7 +6,9 @@ import com.springboot.coffee.dto.CoffeeResponseDto;
 import com.springboot.coffee.entity.Coffee;
 import com.springboot.coffee.mapper.CoffeeMapper;
 import com.springboot.coffee.service.CoffeeService;
+import com.springboot.member.dto.PageDto;
 import com.springboot.utils.UriCreator;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v10/coffees")
@@ -55,11 +58,24 @@ public class CoffeeController {
     }
 
     @GetMapping
-    public ResponseEntity getCoffees() {
-        List<Coffee> coffees = coffeeService.findCoffees();
-        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
+    public ResponseEntity getCoffees(@RequestParam("page") int page,
+                                     @RequestParam("size") int size) {
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        //엔티티를 Dto로 변환
+        Page<Coffee> coffees = coffeeService.findCoffees(page, size);
+//        List<CoffeeResponseDto> response = mapper.coffeesToCoffeeResponseDtos(coffees);
+        Page<CoffeeResponseDto> response = coffees.map(coffee -> mapper.coffeeToCoffeeResponseDto(coffee));
+        PageDto<CoffeeResponseDto> pageDto = PageDto.<CoffeeResponseDto>builder()
+                .data(response.stream().collect(Collectors.toList()))
+                .pageInfo(PageDto.PageInfo.builder()
+                        .page(page)
+                        .size(size)
+                        .totalElements((int)response.getTotalElements())
+                        .totalPages(response.getTotalPages())
+                        .build())
+                .build();
+
+        return new ResponseEntity<>(pageDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{coffee-id}")

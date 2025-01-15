@@ -64,6 +64,8 @@ public class MemberService {
         Pageable pageable = PageRequest.of(page -1, size, Sort.by("memberId").descending());
         Page<Member> memberPages = memberRepository.findAll(pageable);
 
+
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.DESC,"memberId");
         return memberPages;
     }
 
