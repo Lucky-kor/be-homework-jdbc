@@ -1,5 +1,7 @@
+
 package com.springboot.member.controller;
 
+import com.springboot.member.dto.PageResponseDto;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
@@ -8,6 +10,7 @@ import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -71,12 +74,27 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
-        // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+    // 페이지 번호와 페이지 사이즈를 파라미터로 넣는다. 1이상 숫자이여야 하기에 @Positive 사용
+    public ResponseEntity<PageResponseDto> getMembers(@RequestParam("page") @Positive int page, @RequestParam("size") @Positive int size) {
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        // 클라이언트는 1이지만 Spring Data JPA는 페이지 번호가 0부터 시작하므로 -1 해준다.
+        Page<Member> memberPage = memberService.findMembers(page - 1, size);
+        // 페이지 정보 생성
+        PageResponseDto.PageInfo pageInfo = PageResponseDto.PageInfo.builder()
+                .page(page) // 페이지 번호
+                .size(size) // 한페이지 회원수
+                .totalElements((int)memberPage.getTotalElements()) // 전체 회원수
+                .totalPages(memberPage.getTotalPages()) // 전체 페이지 수
+                .build();
+
+        // 회원 정보를 DTO 형태로 변환
+        List<Member> memberList = memberPage.getContent();
+        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(memberList);
+
+        // 페이지 정보와 회원 리스트를 포함한 응답 생성
+        PageResponseDto responseDto = new PageResponseDto(response, pageInfo);
+
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
