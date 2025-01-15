@@ -72,7 +72,6 @@ public class MemberController {
     @GetMapping
     public ResponseEntity getMembers(@Positive @RequestParam("page") int page,
                                      @Positive @RequestParam("size") int size) {
-        // TODO 페이지네이션을 적용하세요!
         Page<Member> members = memberService.findMembers(page, size);
         Page<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
         PageDto<MemberResponseDto> dto = PageDto.<MemberResponseDto>builder()
