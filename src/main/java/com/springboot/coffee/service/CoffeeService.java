@@ -56,7 +56,7 @@ public class CoffeeService {
                 .collect(Collectors.toList());
     }
 
-    public List<Coffee> findCoffees() {
+    public List<Coffee> findCoffees(int page, int size) {
         return (List<Coffee>) coffeeRepository.findAll();
     }
 
