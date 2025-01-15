@@ -1,5 +1,6 @@
 package com.springboot.member.controller;
 
+import com.springboot.member.dto.MemberPageResponseDto;
 import com.springboot.member.dto.MemberPatchDto;
 import com.springboot.member.dto.MemberPostDto;
 import com.springboot.member.dto.MemberResponseDto;
@@ -8,6 +9,7 @@ import com.springboot.member.mapper.MemberMapper;
 import com.springboot.member.service.MemberService;
 import com.springboot.utils.UriCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -71,12 +73,24 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity getMembers() {
+    public ResponseEntity getMembers(@Positive @RequestParam("page") int page,
+                                     @Positive @RequestParam("size") int size) { //
         // TODO 페이지네이션을 적용하세요!
-        List<Member> members = memberService.findMembers();
-        List<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
+        //서비스-레파지토리의 메서드를 가져온거야
+        Page<Member> members = memberService.findMembers(page, size); //findMember가 param으로 받을 타입과 어떤 일을 할지 정해놓으니 받으면 그 기능에 적용됨
+        Page<MemberResponseDto> response = mapper.membersToMemberResponseDtos(members);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        MemberPageResponseDto dto = MemberPageResponseDto.builder()
+                .data(mapper.pageToList(response))
+                .pageInfo(MemberPageResponseDto.PageInfo.builder()
+                        .page(page)
+                        .size(size)
+                        .totalElements((int)members.getTotalElements())
+                        .totalPages(members.getTotalPages())
+                        .build()
+                )
+                .build();
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
