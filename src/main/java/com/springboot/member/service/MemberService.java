@@ -4,6 +4,10 @@ import com.springboot.exception.BusinessLogicException;
 import com.springboot.exception.ExceptionCode;
 import com.springboot.member.entity.Member;
 import com.springboot.member.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,10 +52,20 @@ public class MemberService {
         return findVerifiedMember(memberId);
     }
 
-    public List<Member> findMembers() {
-        // TODO 페이지네이션을 적용하세요!
-        return (List<Member>) memberRepository.findAll();
+//    public List<Member> findMembers() {
+//        // TODO 페이지네이션을 적용하세요!
+//        return (List<Member>) memberRepository.findAll();
+//    }
+//   매개변수로 (int page, int size) 2개를 받는다.
+    public Page<Member> findMembers(int page, int size) {
+//        page 개수와 size(page별 데이터 개수)를 매개변수로 받아 PageRequest 객체를 생성해 repository로 반환한다.
+//        PageRequest는 Pageable을 구현, Sort 객체를 배개변수로 받아 정렬조건을 설정할 수 도 있다.
+//        PageRequest pageRequest = PageRequest.of(page,size);
+//        return memberRepository.findAllByOrderByMemberIdDesc(pageRequest);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("memberId").descending ());
+        return memberRepository.findAll (pageable);
     }
+
 
     public void deleteMember(long memberId) {
         Member findMember = findVerifiedMember(memberId);
